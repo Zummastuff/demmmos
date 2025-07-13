@@ -1,0 +1,56 @@
+#define m1 3   // PWM kanan belakang
+#define m2 5   // PWM kiri belakang
+#define m3 9   // arah kanan
+#define m4 10  // arah kiri
+
+void setup() {	
+  pinMode(m1, OUTPUT);	
+  pinMode(m2, OUTPUT);	
+  pinMode(m3, OUTPUT);	
+  pinMode(m4, OUTPUT);	
+  pinMode(12, INPUT);  // sensor kiri
+  pinMode(13, INPUT);  // sensor kanan
+}
+
+void loop() {
+  // Pembacaan sensor IR
+  int lsensor = digitalRead(12);	
+  int rsensor = digitalRead(13);
+
+  // Logika robot berdasarkan kondisi sensor
+  if ((lsensor == LOW) && (rsensor == LOW)) {
+    // Garis di tengah - maju
+    motorOut(80, 80, 2);
+  }	
+  else if ((lsensor == HIGH) && (rsensor == LOW)) {
+    // Hanya sensor kiri tidak melihat garis - belok kiri
+    motorOut(80, 20, 2);
+  }
+  else if ((lsensor == LOW) && (rsensor == HIGH)) {
+    // Hanya sensor kanan tidak melihat garis - belok kanan
+    motorOut(20, 80, 2);
+  }
+  else if ((lsensor == HIGH) && (rsensor == HIGH)) {
+    // Tidak ada garis terdeteksi - stop
+    motorOut(0, 0, 2);
+  }
+}
+
+// Fungsi kontrol motor
+void motorOut(unsigned char lpwm, unsigned char rpwm, int arah) {
+  // arah = 1 -> mundur, 2 -> maju
+  if (arah == 1) {
+    // Mundur
+    digitalWrite(m3, HIGH);	
+    digitalWrite(m1, LOW);	
+    analogWrite(m4, 255 - lpwm);	
+    analogWrite(m2, rpwm);	
+  }	
+  else if (arah == 2) {
+    // Maju
+    digitalWrite(m3, LOW);	
+    digitalWrite(m1, HIGH);	
+    analogWrite(m4, lpwm);	
+    analogWrite(m2, 255 - rpwm);	
+  }
+}
